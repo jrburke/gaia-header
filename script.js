@@ -1,4 +1,15 @@
-(function(define){'use strict';define(function(require,exports,module){
+'use strict';
+
+define('text!gaia-header/template.html', function() {
+  return [
+    '<div class="inner">',
+      '<button class="action-button"></button>',
+      '<content></content>',
+    '</div>'
+  ].join('');
+});
+
+define('gaia-header/script', function(require,exports,module){
 /*globals define*//*jshint node:true*/
 
 /**
@@ -10,9 +21,6 @@ var fontFit = require('./lib/font-fit');
 /**
  * Locals
  */
-
-var baseComponents = window.COMPONENTS_BASE_URL || 'bower_components/';
-var base = window.GAIA_HEADER_BASE_URL || baseComponents + 'gaia-header/';
 
 // Extend from the HTMLElement prototype
 var proto = Object.create(HTMLElement.prototype);
@@ -72,7 +80,7 @@ proto.styleHack = function() {
   var self = this;
 
   this.style.visibility = 'hidden';
-  style.innerHTML = '@import url(' + base + 'style.css);';
+  style.innerHTML = '@import url(' + require.toUrl('./style.css') + ');';
   style.setAttribute('scoped', '');
   this.classList.add('content');
   this.appendChild(style);
@@ -173,30 +181,11 @@ proto.onActionButtonClick = function(e) {
 // things getting out of sync. This is a short-term
 // hack until we can import entire custom-elements
 // using HTML Imports (bug 877072).
-var template = document.createElement('template');
-template.innerHTML = [
-  '<div class="inner">',
-    '<button class="action-button"></button>',
-    '<content></content>',
-  '</div>'
-].join('');
+var template = require('tmpl!./template.html');
 
-// Load the icon-font into the document <head>
-(function loadFont() {
-  var href = baseComponents + 'gaia-icons/style.css';
-  var existing = document.querySelector('link[href="' + href + '"]');
-  if (existing) { return; }
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.type = 'text/css';
-  link.href = href;
-  document.head.appendChild(link);
-})();
+require('css!gaia-icons/style');
 
 // Register and return the constructor
 module.exports = document.registerElement('gaia-header', { prototype: proto });
 
-});})((function(n,w){'use strict';return typeof define=='function'&&define.amd?
-define:typeof module=='object'?function(c){c(require,exports,module);}:
-function(c){var m={exports:{}},r=function(n){return w[n];};
-w[n]=c(r,m.exports,m)||m.exports;};})('gaia-header',this));
+});
